@@ -1,0 +1,7 @@
+generatorName: dart-dio
+inputSpec: ../backend/openapi.json
+outputDir: lib/generated_api
+additionalProperties:
+  pubName: albums_api_client
+  pubVersion: 1.0.0
+  useEnumExtension: true
