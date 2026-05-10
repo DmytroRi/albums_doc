@@ -1,0 +1,12 @@
+{
+  "name": "albums-frontend",
+  "dockerComposeFile": ["../../docker-compose.dev.yml"],
+  "service": "frontend",
+  "workspaceFolder": "/app",
+  "customizations": {
+    "vscode": {
+      "extensions": ["Dart-Code.flutter", "Dart-Code.dart-code"]
+    }
+  },
+  "postCreateCommand": "flutter pub get"
+}

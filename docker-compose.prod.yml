@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: always
+    env_file: ./backend/.env.example
+    volumes: ["pgdata_prod:/var/lib/postgresql/data"]
+
+  backend:
+    build: ./backend
+    restart: always
+    env_file: ./backend/.env.example
+    depends_on: [postgres]
+
+  frontend:
+    image: ghcr.io/cirruslabs/flutter:3.24.3
+    working_dir: /app
+    command: bash -lc "flutter build web && python3 -m http.server 8080 --directory build/web"
+    ports: ["8080:8080"]
+    volumes:
+      - ./frontend:/app
+    depends_on: [backend]
+
+volumes:
+  pgdata_prod:
