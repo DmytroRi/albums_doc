@@ -19,14 +19,9 @@
   ],
   "shutdownAction": "none",
   "forwardPorts": [
-    3000,
-    8000
+    3000
   ],
   "portsAttributes": {
-    "8000": {
-      "label": "FastAPI Backend",
-      "onAutoForward": "notify"
-    },
     "3000": {
       "label": "Flutter Frontend",
       "onAutoForward": "openBrowser"
