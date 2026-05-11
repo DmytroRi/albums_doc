@@ -1,7 +1,7 @@
 {
   "name": "albums-backend",
   "dockerComposeFile": [
-    "../../docker-compose.dev.yml"
+    "../docker-compose.dev.yml"
   ],
   "service": "backend",
   "overrideCommand": true,

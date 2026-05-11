@@ -9,11 +9,11 @@ services:
     volumes: ["pgdata_dev:/var/lib/postgresql/data"]
 
   backend:
-    build: ./backend
-    env_file: ./backend/.env.example
+    build: ./../backend
+    env_file: ./../backend/.env.example
     ports: ["8000:8000"]
     volumes:
-      - ./backend:/app
+      - ./../backend:/app
     depends_on: [postgres]
 
   frontend:
@@ -22,7 +22,7 @@ services:
     command: bash -lc "flutter pub get && flutter run -d web-server --web-port 3000 --web-hostname 0.0.0.0"
     ports: ["3000:3000"]
     volumes:
-      - ./frontend:/app
+      - ./../frontend:/app
     depends_on: [backend]
 
 volumes:

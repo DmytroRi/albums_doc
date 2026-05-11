@@ -1,7 +1,7 @@
 {
   "name": "albums-frontend",
   "dockerComposeFile": [
-    "../../docker-compose.dev.yml"
+    "../docker-compose.dev.yml"
   ],
   "service": "frontend",
   "workspaceFolder": "/app",
