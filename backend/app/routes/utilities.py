@@ -7,6 +7,51 @@ from app.db.session import get_session
 
 router = APIRouter(prefix="/dev", tags=["dev"])
 
+@router.get("/tables", include_in_schema=False)
+def get_tables_with_row_counts(
+    session: Session = Depends(get_session)
+) -> dict:
+    """Get all public tables with row counts."""
+
+    statement = text("""
+        SELECT
+            table_name,
+            (
+                xpath(
+                    '/row/count/text()',
+                    query_to_xml(
+                        format(
+                            'SELECT count(*) FROM public.%I',
+                            table_name
+                        ),
+                        false,
+                        true,
+                        ''
+                    )
+                )
+            )[1]::text::bigint AS row_count
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_type = 'BASE TABLE'
+        ORDER BY table_name;
+    """)
+
+    result = session.exec(statement).all()
+
+    tables = [
+        {
+            "table_name": row[0],
+            "row_count": row[1],
+        }
+        for row in result
+    ]
+
+    return {
+        "schema": "public",
+        "tables": tables,
+        "count": len(tables)
+    }
+
 @router.get("/{table_name}", include_in_schema=False)
 def get_table_info(table_name: str, session: Session = Depends(get_session)):
     """Get information about a table."""
@@ -45,7 +90,7 @@ def get_table_info(table_name: str, session: Session = Depends(get_session)):
     }
 
 
-@router.get("/{table_name}/all")
+@router.get("/{table_name}/all", include_in_schema=False)
 def get_all_table_rows(
     table_name: str,
     session: Session = Depends(get_session)
