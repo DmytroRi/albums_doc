@@ -15,8 +15,6 @@
   },
   "postCreateCommand": "flutter pub get",
   "runServices": [
-    "postgres",
-    "backend",
     "frontend"
   ],
   "shutdownAction": "none",

@@ -34,8 +34,7 @@
   },
   "runServices": [
     "postgres",
-    "backend",
-    "frontend"
+    "backend"
   ],
   "shutdownAction": "none"
 }
