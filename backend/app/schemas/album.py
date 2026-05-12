@@ -1,53 +1,53 @@
+from datetime import date
 from typing import Optional
 
 from pydantic import BaseModel, Field
 
 
 class TrackCreate(BaseModel):
+    track_number: int = Field(gt=0)
     title: str
-    duration_seconds: int = Field(gt=0)
-    track_order: int = Field(gt=0)
+    length_seconds: Optional[int] = Field(default=None, gt=0)
+    vibes: list[str] = []
 
 
 class AlbumCreate(BaseModel):
     title: str
-    release_year: int
-    grade: float = Field(ge=0, le=10)
+    release_date: Optional[date] = None
+    grade: Optional[float] = Field(default=None, ge=0, le=5)
     artists: list[str]
-    producers: list[str]
     genres: list[str]
-    moods: list[str]
-    tracks: list[TrackCreate]
+    vibes: list[str] = []
+    tracks: list[TrackCreate] = []
 
 
 class AlbumUpdate(BaseModel):
     title: Optional[str] = None
-    release_year: Optional[int] = None
-    grade: Optional[float] = Field(default=None, ge=0, le=10)
+    release_date: Optional[date] = None
+    grade: Optional[float] = Field(default=None, ge=0, le=5)
     artists: Optional[list[str]] = None
-    producers: Optional[list[str]] = None
     genres: Optional[list[str]] = None
-    moods: Optional[list[str]] = None
+    vibes: Optional[list[str]] = None
     tracks: Optional[list[TrackCreate]] = None
 
 
 class TrackRead(BaseModel):
     id: int
+    track_number: int
     title: str
-    duration_seconds: int
-    track_order: int
+    length_seconds: Optional[int] = None
+    vibes: list[str]
 
 
 class AlbumSummary(BaseModel):
     id: int
     title: str
-    release_year: int
-    grade: float
+    release_date: Optional[date] = None
+    grade: Optional[float] = None
     artists: list[str]
 
 
 class AlbumRead(AlbumSummary):
-    producers: list[str]
     genres: list[str]
-    moods: list[str]
+    vibes: list[str]
     tracks: list[TrackRead]
