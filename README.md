@@ -48,6 +48,7 @@ docker compose -f docker-compose.dev.yml up --build
 
 Start only PostgreSQL:
 ```bash
+cd .devcontainer/
 docker compose -f docker-compose.dev.yml up -d postgres
 ```
 

@@ -1,7 +1,7 @@
 {
   "name": "albums-frontend",
   "dockerComposeFile": [
-    "../../docker-compose.dev.yml"
+    "../docker-compose.dev.yml"
   ],
   "service": "frontend",
   "workspaceFolder": "/app",
@@ -15,20 +15,13 @@
   },
   "postCreateCommand": "flutter pub get",
   "runServices": [
-    "postgres",
-    "backend",
     "frontend"
   ],
   "shutdownAction": "none",
   "forwardPorts": [
-    3000,
-    8000
+    3000
   ],
   "portsAttributes": {
-    "8000": {
-      "label": "FastAPI Backend",
-      "onAutoForward": "notify"
-    },
     "3000": {
       "label": "Flutter Frontend",
       "onAutoForward": "openBrowser"
