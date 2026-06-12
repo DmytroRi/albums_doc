@@ -1,29 +1,75 @@
 services:
   postgres:
-    image: postgres:16
+    image: postgres:15-alpine
     environment:
-      POSTGRES_USER: albums
-      POSTGRES_PASSWORD: albums
-      POSTGRES_DB: albums
-    ports: ["5432:5432"]
-    volumes: ["pgdata_dev:/var/lib/postgresql/data"]
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: albums_dev
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports: 
+      - "5432:5432"
+    networks:
+      - network-dev
+    volumes: 
+      - "albums_data_dev:/var/lib/postgresql/data"
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   backend:
-    build: ./../backend
-    env_file: ./../backend/.env.example
-    ports: ["8000:8000"]
+    build:
+      context: ../backend
+      dockerfile: Dockerfile 
+      target: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    user: "1000:1000"
+    ports:
+      - "8000:8000"
+      - "5678:5678"
+    networks:
+      - network-dev
+    command: sleep infinity
+    cap_add: 
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/albums_dev
+      - DATABASE_URL_SYNC=postgresql://postgres:password@postgres:5432/albums_dev
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - PYTHONPATH=/workspace
     volumes:
-      - ./../backend:/app
-    depends_on: [postgres]
+      - ../backend
+      - backend-venv:/workspace/.venv
+      - /var/run/docker.sock:/var/run/docker.sock
 
   frontend:
-    image: ghcr.io/cirruslabs/flutter:3.24.3
-    working_dir: /app
-    command: bash -lc "flutter pub get && flutter run -d web-server --web-port 3000 --web-hostname 0.0.0.0"
-    ports: ["3000:3000"]
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile 
+      target: development
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+      - "9222:9222"
+    networks:
+      - network-dev
+    command: sleep infinity
+    cap_add: 
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined  
+    environment:
+      - FLUTTER_WEB=true
+      - CHROME_EXECUTABLE=/usr/bin/chromium
     volumes:
-      - ./../frontend:/app
-    depends_on: [backend]
-
-volumes:
-  pgdata_dev:
+      - ../frontend:/workspace:cached
+      - ../packages:/workspace/packages:cached
+      - flutter_pub_cache:/root/.pub-cache
