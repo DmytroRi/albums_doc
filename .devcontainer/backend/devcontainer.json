@@ -44,12 +44,6 @@
       }
     }
   },
-  "features": {
-    "ghcr.io/devcontainers/features/git:1": {
-      "version": "latest",
-      "ppa": true
-    }
-  },
   "forwardPorts": [
     8000,
     5678,

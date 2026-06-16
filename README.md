@@ -75,6 +75,8 @@ flutter run -d web-server --web-hostname 0.0.0.0 --web-port 3000 --dart-define=A
 
 ## Devcontainers
 
+The devcontainer configs avoid remote Dev Container Features so opening containers does not need to resolve `ghcr.io/devcontainers/features/*`; required OS tools such as Git are installed by the service Dockerfiles.
+
 Backend devcontainer:
 
 1. Open the repository in VS Code.
