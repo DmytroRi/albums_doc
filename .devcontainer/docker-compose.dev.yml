@@ -39,8 +39,8 @@ services:
     security_opt:
       - seccomp:unconfined
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/albums_dev
-      - DATABASE_URL_SYNC=postgresql://postgres:password@postgres:5432/albums_dev
+      - DATABASE_URL=postgresql+asyncpg://user:password@postgres:5432/albums_dev
+      - DATABASE_URL_SYNC=postgresql://user:password@postgres:5432/albums_dev
       - ENVIRONMENT=development
       - DEBUG=true
       - PYTHONPATH=/workspace
