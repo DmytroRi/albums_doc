@@ -1,12 +1,12 @@
-set -e
-echo "Setting git configurations"
-get config --global --unset-all safe.directory || true
-get config --global --add safe.directory '*' || true
+#!/usr/bin/env bash
+set -euo pipefail
 
-chmod +x scripts/*.sh 2>/dev/null || true
+echo "Configuring Git safe directory"
+git config --global --unset-all safe.directory || true
+git config --global --add safe.directory '*'
 
 echo "Installing Python dependencies"
 cd /workspace
-source .venv/bin/activate
-pip install -e ".[dev]"
-echo "Dependencies installed"
+python -m pip install -r requirements.txt
+
+echo "Backend devcontainer ready"
