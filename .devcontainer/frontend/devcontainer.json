@@ -1,5 +1,5 @@
 {
-  "name": "Frontend Converter Incidents",
+  "name": "albums-frontend",
   "dockerComposeFile": [
     "./docker-compose.dev.yml"
   ],
