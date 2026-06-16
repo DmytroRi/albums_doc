@@ -1,67 +1,49 @@
 {
   "name": "albums-backend",
   "dockerComposeFile": [
-    "../docker-compose.dev.yml"
+    "../../docker-compose.dev.yml"
   ],
   "service": "backend",
   "shutdownAction": "none",
   "workspaceFolder": "/workspace",
-  "customizations":{
-    "vscode":{
+  "customizations": {
+    "vscode": {
       "extensions": [
         "ms-python.python",
-        "ms-python.pylint",
-        "ms-python.black-formater",
+        "ms-python.black-formatter",
         "ms-python.isort",
         "ms-python.mypy-type-checker",
         "ms-python.flake8"
       ],
-      "settings":{
-        "python.defaultInterpreterPath":"/usr/local/bin/python",
-        "python.linting.enabled": true,
-        "python.linting.pylintEnabled": true,
-        "python.linting.flake8Enabled": true,
-        "python.linting.mypeEnabled": true,
-        "python.formatting.provider": "black",
-        "python.formatting.blackArgs": ["--line-length=80"],
-        "python.sortImports.args": ["--profile", "black"],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
         "python.testing.pytestEnabled": true,
-        "python.testing.pytestArgs":["tests/","-v","--tb=short"],
+        "python.testing.pytestArgs": [
+          "tests",
+          "-v",
+          "--tb=short"
+        ],
         "python.testing.unittestEnabled": false,
-        "python.testing.autoTestDiscoverOnSaveEnabled": true,
         "editor.formatOnSave": true,
-        "editor.codeActionOnSave":{
-          "source.organizeImports": true
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "explicit"
         },
-        "editor.rules":[
+        "editor.rulers": [
           101
         ],
-        "files.exclude":{
-          "**/_pycache__": true,
+        "files.exclude": {
+          "**/__pycache__": true,
           "**/*.pyc": true,
           ".pytest_cache": true,
           ".coverage": true,
           "htmlcov": true,
-          ".tox": true,
           ".mypy_cache": true
         },
-        "terminal.integrated.defaultProfile.linux":"bash",
+        "terminal.integrated.defaultProfile.linux": "bash",
         "terminal.integrated.cwd": "/workspace"
       }
     }
-  },  
-  "features":{
-    "ghcr.io/devcontainers/features/git:1":{
-      "version": "latest",
-      "ppa": true
-    },
-    "ghcr.io/devcontainers/features/docker-in-docker:2":{
-      "version": "latest",
-      "moby": true,
-      "dockerDashComposeVersion": "v2"
-    }
   },
-
   "forwardPorts": [
     8000,
     5678,
@@ -71,14 +53,13 @@
     "8000": {
       "label": "FastAPI Backend",
       "onAutoForward": "notify",
-      "protocol": "http",
-      "host": "0.0.0.0"
+      "protocol": "http"
     },
     "5678": {
       "label": "Python Debug",
       "onAutoForward": "silent"
     },
-    "5432":{
+    "5432": {
       "label": "PostgreSQL",
       "onAutoForward": "silent"
     }
@@ -86,10 +67,5 @@
   "postCreateCommand": "bash .vscode/post-create.sh",
   "postStartCommand": "bash .vscode/post-start.sh",
   "remoteUser": "vscode",
-  "overrideCommand": false,
-  "mounts": [
-    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=blind",
-    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=blind,consistency=cached"
-  ],
-  "initializeCommand": "docker network create network-dev || true"
+  "overrideCommand": false
 }

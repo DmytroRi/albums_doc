@@ -1,12 +1,11 @@
 {
   "name": "albums-frontend",
   "dockerComposeFile": [
-    "./docker-compose.dev.yml"
+    "../../docker-compose.dev.yml"
   ],
-  "service": "frontend-converter-incidents",
+  "service": "frontend",
   "workspaceFolder": "/workspace",
   "shutdownAction": "none",
-
   "customizations": {
     "vscode": {
       "extensions": [
@@ -14,8 +13,7 @@
         "Dart-Code.flutter",
         "alexisvt.flutter-snippets",
         "Nash.awesome-flutter-snippets",
-        "localizely.flutter-intl",
-        "Anthropic.claude-code"
+        "localizely.flutter-intl"
       ],
       "settings": {
         "dart.flutterSdkPath": "/opt/flutter",
@@ -23,28 +21,14 @@
         "dart.openDevTools": "flutter",
         "dart.debugExternalPackageLibraries": true,
         "dart.debugSdkLibraries": false,
-        "dart.evaluateGettersInDebugViews": true,
         "dart.previewFlutterUiGuides": true,
-        "dart.previewFlutterUiGuidesCustomTracking": true,
-        "dart.hotReloadOnSave": "always",
-        "dart.flutterCreateAndroidLanguage": "kotlin",
-        "dart.flutterCreateIOSLanguage": "swift",
         "dart.lineLength": 101,
         "dart.chromeExecutable": "/usr/bin/chromium",
-        "dart.vmServicePort": 8080,
-        "dart.debugExtensionBackendProtocol": "ws",
-        "dart.embedDevTools": false,
-        "dart.devToolsLocation": "beside",
         "editor.formatOnSave": true,
         "editor.rulers": [
           80,
           101
         ],
-        "editor.selectionHighlight": false,
-        "editor.suggest.snippetsPreventQuickSuggestions": false,
-        "editor.suggestSelection": "first",
-        "editor.tabCompletion": "onlySnippets",
-        "editor.wordBasedSuggestions": false,
         "files.exclude": {
           "**/.dart_tool": true,
           "**/.packages": true,
@@ -58,78 +42,27 @@
       }
     }
   },
-
   "forwardPorts": [
     3000,
-    8080,
+    9222,
     "9100-9101"
   ],
-
   "portsAttributes": {
     "3000": {
       "label": "Flutter Web Server",
       "onAutoForward": "openBrowser",
-      "protocol": "http",
-      "host": "0.0.0.0"
+      "protocol": "http"
     },
-    "8080": {
-      "label": "Dart Observatory/VM Service",
-      "onAutoForward": "silent",
-      "host": "0.0.0.0"
+    "9222": {
+      "label": "Chrome Debug",
+      "onAutoForward": "silent"
     },
     "9100-9101": {
       "label": "Flutter DevTools",
       "onAutoForward": "silent"
     }
   },
-
-  "postCreateCommand": "bash /workspace/.vscode/post-create.sh",
-  // "remoteUser": "vscode",
-  // "overrideCommand": false,
-
-  "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.claude,target=/root/.claude,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.claude.json,target=/root/.claude.json,type=bind,consistency=cached"
-  ],
-
-  "initializeCommand": "docker network create dev-network || true",
-
-  "runArgs": [
-    "--env",
-    "DISPLAY=${localEnv:DISPLAY}",
-    "--env",
-    "WAYLAND_DISPLAY=${localEnv:WAYLAND_DISPLAY}",
-    "--env",
-    "XDG_RUNTIME_DIR=${localEnv:XDG_RUNTIME_DIR}",
-    "--env",
-    "PULSE_SERVER=${localEnv:PULSE_SERVER}",
-    "--env",
-    "CHROME_EXECUTABLE=/usr/bin/chromium",
-    "--volume",
-    "/tmp/.X11-unix:/tmp/.X11-unix",
-    "--volume",
-    "/mnt/wslg:/mnt/wslg",
-    "--volume",
-    "${localEnv:XDG_RUNTIME_DIR}:${localEnv:XDG_RUNTIME_DIR}",
-    "--cap-add",
-    "SYS_ADMIN"
-  ],
-
-  "features": {
-    "ghcr.io/devcontainers/features/git:1": {
-      "version": "latest",
-      "ppa": true
-    },
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {
-      "version": "latest",
-      "moby": true,
-      "dockerDashComposeVersion": "v2"
-    },
-    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
-  },
-
-  "containerEnv": {
-    "APP_CONFIG_SRC": "/workspace/web/config.json"
-  }
+  "postCreateCommand": "flutter pub get",
+  "remoteUser": "root",
+  "overrideCommand": false
 }
