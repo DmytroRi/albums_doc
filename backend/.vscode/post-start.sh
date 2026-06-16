@@ -1,5 +1,5 @@
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
 cd /workspace
-source ..venv/bin/activate
-/workspace/migrate.sh upgrade
+alembic upgrade head

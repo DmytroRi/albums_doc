@@ -1,0 +1,70 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: albums
+      POSTGRES_PASSWORD: albums
+      POSTGRES_DB: albums
+    ports:
+      - "5432:5432"
+    networks:
+      - albums_dev
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U albums -d albums"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://albums:albums@postgres:5432/albums
+      ENVIRONMENT: development
+      DEBUG: "true"
+      PYTHONPATH: /workspace
+    ports:
+      - "8000:8000"
+      - "5678:5678"
+    networks:
+      - albums_dev
+    volumes:
+      - ./backend:/workspace:cached
+    command: sleep infinity
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    depends_on:
+      - backend
+    environment:
+      FLUTTER_WEB: "true"
+      CHROME_EXECUTABLE: /usr/bin/chromium
+      BACKEND_OPENAPI_URL: http://backend:8000/openapi.json
+    ports:
+      - "3000:3000"
+      - "9222:9222"
+    networks:
+      - albums_dev
+    volumes:
+      - ./frontend:/workspace:cached
+      - flutter_pub_cache:/root/.pub-cache
+    command: sleep infinity
+
+volumes:
+  postgres_data_dev:
+  flutter_pub_cache:
+
+networks:
+  albums_dev:
+    name: albums_dev
