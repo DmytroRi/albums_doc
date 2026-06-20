@@ -1,7 +1,13 @@
 from sqlmodel import Session, delete, select
 
-from app.models.models import Album, Artist, Genre, Track, Vibe
-from app.schemas.album import AlbumCreate, AlbumRead, AlbumSummary, AlbumUpdate, TrackRead
+from app.models import Album, Artist, Genre, Track, Vibe
+from app.schemas.album import (
+    AlbumCreate,
+    AlbumRead,
+    AlbumSummary,
+    AlbumUpdate,
+    TrackRead,
+)
 
 
 class AlbumService:
@@ -39,11 +45,15 @@ class AlbumService:
         )
 
     def create_album(self, data: AlbumCreate) -> AlbumRead:
-        album = Album(title=data.title, release_date=data.release_date, grade=data.grade)
+        album = Album(
+            title=data.title, release_date=data.release_date, grade=data.grade
+        )
         self.session.add(album)
         self.session.flush()
 
-        album.artists = [self._get_or_create_named(Artist, name) for name in data.artists]
+        album.artists = [
+            self._get_or_create_named(Artist, name) for name in data.artists
+        ]
         album.genres = [self._get_or_create_named(Genre, name) for name in data.genres]
         album.vibes = [self._get_or_create_named(Vibe, name) for name in data.vibes]
 

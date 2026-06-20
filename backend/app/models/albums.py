@@ -1,13 +1,19 @@
 from datetime import date
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
 
-from app.models.tracks import Track
+from app.models.links import AlbumArtistLink, AlbumGenreLink, AlbumVibeLink
+
+if TYPE_CHECKING:
+    from app.models.artists import Artist
+    from app.models.genres import Genre
+    from app.models.tracks import Track
+    from app.models.vibes import Vibe
 
 
 class AlbumBase(SQLModel):
-    """Shared fields for /albums' classes."""
+    """Shared fields for album classes."""
 
     title: str
     release_date: Optional[date] = None
@@ -52,6 +58,6 @@ class AlbumUpdate(SQLModel):
 
 
 class AlbumRead(AlbumBase):
-    """Response model for GET /albums"""
+    """Response model for GET /albums."""
 
     id: int
