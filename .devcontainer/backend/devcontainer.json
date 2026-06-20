@@ -1,40 +1,71 @@
 {
   "name": "albums-backend",
   "dockerComposeFile": [
-    "../docker-compose.dev.yml"
+    "../../docker-compose.dev.yml"
   ],
   "service": "backend",
-  "overrideCommand": true,
-  "workspaceFolder": "/app",
-  "forwardPorts": [
-    3000,
-    8000
-  ],
-  "portsAttributes": {
-    "8000": {
-      "label": "FastAPI Backend",
-      "onAutoForward": "notify"
-    },
-    "3000": {
-      "label": "Flutter Frontend",
-      "onAutoForward": "openBrowser"
-    }
-  },
+  "shutdownAction": "none",
+  "workspaceFolder": "/workspace",
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-python.python",
-        "ms-python.vscode-pylance"
-      ]
+        "ms-python.black-formatter",
+        "ms-python.isort",
+        "ms-python.mypy-type-checker",
+        "ms-python.flake8"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": [
+          "tests",
+          "-v",
+          "--tb=short"
+        ],
+        "python.testing.unittestEnabled": false,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "explicit"
+        },
+        "editor.rulers": [
+          101
+        ],
+        "files.exclude": {
+          "**/__pycache__": true,
+          "**/*.pyc": true,
+          ".pytest_cache": true,
+          ".coverage": true,
+          "htmlcov": true,
+          ".mypy_cache": true
+        },
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.cwd": "/workspace"
+      }
     }
   },
-  "postCreateCommand": "pip install -r requirements.txt",
-  "remoteEnv": {
-    "DATABASE_URL": "postgresql+psycopg://albums:albums@postgres:5432/albums"
-  },
-  "runServices": [
-    "postgres",
-    "backend"
+  "forwardPorts": [
+    8000,
+    5678,
+    5432
   ],
-  "shutdownAction": "none"
+  "portsAttributes": {
+    "8000": {
+      "label": "FastAPI Backend",
+      "onAutoForward": "notify",
+      "protocol": "http"
+    },
+    "5678": {
+      "label": "Python Debug",
+      "onAutoForward": "silent"
+    },
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "silent"
+    }
+  },
+  "postCreateCommand": "bash .vscode/post-create.sh",
+  "postStartCommand": "bash .vscode/post-start.sh",
+  "remoteUser": "vscode",
+  "overrideCommand": false
 }

@@ -1,26 +1,30 @@
 # Albums Doc
 
-Full-stack album documentation app with FastAPI + SQLModel backend and Flutter BLoC frontend.
+Full-stack album documentation app with a PostgreSQL database, FastAPI + SQLModel backend, and Flutter BLoC frontend.
 
 ## Project structure
 
-- `backend/` FastAPI app, SQLModel models, Alembic migrations
-- `frontend/` Flutter app (StatelessWidget-only UI), BLoC, generated OpenAPI client location
-- `.devcontainer/backend` backend development container
-- `.devcontainer/frontend` frontend development container
+- `backend/` FastAPI app, SQLModel models, Alembic migrations, and backend Dockerfile
+- `frontend/` Flutter app, generated OpenAPI client, and frontend Dockerfile
+- `.devcontainer/backend` backend VS Code Devcontainer configuration
+- `.devcontainer/frontend` frontend VS Code Devcontainer configuration
 - `docker-compose.dev.yml` development stack
 - `docker-compose.prod.yml` production/public stack
 
 ## Required tools
 
 - Docker + Docker Compose
-- (optional local) Python 3.12+
-- (optional local) Flutter 3.24+
-- OpenAPI Generator CLI (`openapi-generator-cli`)
+- VS Code Dev Containers extension for containerized development
+- Optional local Python 3.12+
+- Optional local Flutter 3.24+
+- Optional local OpenAPI Generator CLI (`openapi-generator-cli`)
 
 ## Environment variables
 
-Use `backend/.env.example`:
+Development and production containers use PostgreSQL service discovery through the Compose service name `postgres`.
+
+`backend/.env.example` defines the backend/database defaults:
+
 - `POSTGRES_USER`
 - `POSTGRES_PASSWORD`
 - `POSTGRES_DB`
@@ -28,65 +32,127 @@ Use `backend/.env.example`:
 - `POSTGRES_PORT`
 - `DATABASE_URL`
 
-## OpenAPI workflow
+For local non-container backend runs, override `DATABASE_URL` if PostgreSQL is exposed on `localhost` instead of the Compose hostname.
 
-FastAPI exposes OpenAPI at `/openapi.json` and docs at `/docs`.
+## Development stack
 
-Generate Dart client:
-```bash
-cd frontend
-./scripts/generate_api_client.sh
-```
-Generator configuration is in `frontend/openapi-generator-config.yaml`.
+Start the full development stack:
 
-## Development stack (WSL/local)
-
-Start full stack:
 ```bash
 docker compose -f docker-compose.dev.yml up --build
 ```
 
 Start only PostgreSQL:
+
 ```bash
-cd .devcontainer/
 docker compose -f docker-compose.dev.yml up -d postgres
 ```
 
-Start only backend:
+Start only backend dependencies and attach to the backend devcontainer from VS Code:
+
 ```bash
-docker compose -f docker-compose.dev.yml up --build backend
+docker compose -f docker-compose.dev.yml up -d postgres backend
 ```
 
-Start only frontend:
+Start only frontend dependencies and attach to the frontend devcontainer from VS Code:
+
 ```bash
-docker compose -f docker-compose.dev.yml up --build frontend
+docker compose -f docker-compose.dev.yml up -d postgres backend frontend
 ```
 
-## Production/public stack (Ubuntu Server)
+Inside the backend devcontainer, run the API server with:
 
-Start full stack:
+```bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Inside the frontend devcontainer, run the web app with:
+
+```bash
+flutter pub get
+flutter run -d web-server --web-hostname 0.0.0.0 --web-port 3000 --dart-define=API_BASE_URL=http://localhost:8000
+```
+
+## Devcontainers
+
+The devcontainer configs avoid remote Dev Container Features so opening containers does not need to resolve `ghcr.io/devcontainers/features/*`; required OS tools such as Git are installed by the service Dockerfiles.
+
+Backend devcontainer:
+
+1. Open the repository in VS Code.
+2. Use **Dev Containers: Reopen in Container** with `.devcontainer/backend/devcontainer.json`.
+3. Run migrations, tests, and `uvicorn` inside the container.
+
+Frontend devcontainer:
+
+1. Open the repository in VS Code.
+2. Use **Dev Containers: Reopen in Container** with `.devcontainer/frontend/devcontainer.json`.
+3. Run `flutter`, web server, and OpenAPI generation commands inside the container.
+
+## OpenAPI workflow
+
+FastAPI exposes OpenAPI at `/openapi.json` and docs at `/docs`.
+
+Generate the Dart client from inside the frontend devcontainer:
+
+```bash
+cd /workspace
+BACKEND_OPENAPI_URL=http://backend:8000/openapi.json ./scripts/generate_api_client.sh
+```
+
+Generate the Dart client from the host while the backend is published on localhost:
+
+```bash
+cd frontend
+BACKEND_OPENAPI_URL=http://localhost:8000/openapi.json ./scripts/generate_api_client.sh
+```
+
+Generator output is written to `frontend/lib/generated_api`.
+
+## Production/public stack
+
+Start the full production stack:
+
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 Start individual services:
+
 ```bash
 docker compose -f docker-compose.prod.yml up -d postgres
 docker compose -f docker-compose.prod.yml up -d backend
 docker compose -f docker-compose.prod.yml up -d frontend
 ```
 
+The production stack publishes:
+
+- Backend API: `http://localhost:8000`
+- Frontend web app: `http://localhost:8080`
+
 ## Container lifecycle commands
 
-Stop:
+Stop development containers while preserving named volumes:
+
 ```bash
 docker compose -f docker-compose.dev.yml down
+```
+
+Stop production containers while preserving named volumes:
+
+```bash
 docker compose -f docker-compose.prod.yml down
 ```
 
-Rebuild:
+Rebuild development images:
+
 ```bash
 docker compose -f docker-compose.dev.yml build --no-cache
+```
+
+Rebuild production images:
+
+```bash
 docker compose -f docker-compose.prod.yml build --no-cache
 ```
 
@@ -94,9 +160,10 @@ docker compose -f docker-compose.prod.yml build --no-cache
 
 ```bash
 cd backend
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload
+DATABASE_URL=postgresql+psycopg://albums:albums@localhost:5432/albums uvicorn app.main:app --reload
 ```
 
 ## Run frontend locally
@@ -104,28 +171,20 @@ uvicorn app.main:app --reload
 ```bash
 cd frontend
 flutter pub get
-flutter run -d web-server --web-port 3000
+flutter run -d web-server --web-port 3000 --dart-define=API_BASE_URL=http://localhost:8000
 ```
-
-## Devcontainers
-
-Backend devcontainer:
-- Open folder in `.devcontainer/backend`
-- Run migrations, tests, and uvicorn inside container
-
-Frontend devcontainer:
-- Open folder in `.devcontainer/frontend`
-- Run flutter and OpenAPI generation commands inside container
 
 ## Alembic migrations
 
 Create migration:
+
 ```bash
 cd backend
 alembic revision --autogenerate -m "message"
 ```
 
 Apply migrations:
+
 ```bash
 cd backend
 alembic upgrade head
@@ -134,15 +193,24 @@ alembic upgrade head
 ## Tests
 
 Backend:
+
 ```bash
 cd backend
 pytest
 ```
 
+Frontend:
+
+```bash
+cd frontend
+flutter test
+```
+
 ## Ubuntu deployment notes
 
-1. Install Docker and Compose plugin.
-2. Copy project to server.
-3. Adjust `backend/.env.example` values for production secrets/hosts.
-4. Run `docker compose -f docker-compose.prod.yml up -d --build`.
-5. Expose frontend port (8080) and backend port through reverse proxy as needed.
+1. Install Docker and the Compose plugin.
+2. Copy the project to the server.
+3. Copy `backend/.env.example` to a production env file or replace its values with production secrets.
+4. Update `docker-compose.prod.yml` to reference the production env file if needed.
+5. Run `docker compose -f docker-compose.prod.yml up -d --build`.
+6. Put a reverse proxy in front of published frontend/backend ports as needed.

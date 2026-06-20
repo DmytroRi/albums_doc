@@ -1,7 +1,3 @@
-albums_frontend
-3.4
-file:///app/
-file:///app/lib/
 async
 2.18
 file:///root/.pub-cache/hosted/pub.dev/async-2.11.0/
@@ -150,4 +146,8 @@ flutter_test
 3.3
 file:///sdks/flutter/packages/flutter_test/
 file:///sdks/flutter/packages/flutter_test/lib/
+albums_frontend
+3.4
+file:///workspace/
+file:///workspace/lib/
 2
