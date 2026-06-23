@@ -1,7 +1,13 @@
 from sqlmodel import Session, delete, select
 
-from app.models.models import Album, Artist, Genre, Track, Vibe
-from app.schemas.album import AlbumCreate, AlbumRead, AlbumSummary, AlbumUpdate, TrackRead
+from app.models import Album, Artist, Genre, Track, Vibe
+from app.schemas.album import (
+    AlbumCreate,
+    AlbumRead,
+    AlbumSummary,
+    AlbumUpdate,
+    TrackRead,
+)
 
 
 class AlbumService:
@@ -29,21 +35,25 @@ class AlbumService:
             tracks=[
                 TrackRead(
                     id=t.id,
-                    track_number=t.track_number,
+                    track_order=t.track_order,
                     title=t.title,
                     length_seconds=t.length_seconds,
                     vibes=[v.name for v in t.vibes],
                 )
-                for t in sorted(album.tracks, key=lambda x: x.track_number)
+                for t in sorted(album.tracks, key=lambda x: x.track_order)
             ],
         )
 
     def create_album(self, data: AlbumCreate) -> AlbumRead:
-        album = Album(title=data.title, release_date=data.release_date, grade=data.grade)
+        album = Album(
+            title=data.title, release_date=data.release_date, grade=data.grade
+        )
         self.session.add(album)
         self.session.flush()
 
-        album.artists = [self._get_or_create_named(Artist, name) for name in data.artists]
+        album.artists = [
+            self._get_or_create_named(Artist, name) for name in data.artists
+        ]
         album.genres = [self._get_or_create_named(Genre, name) for name in data.genres]
         album.vibes = [self._get_or_create_named(Vibe, name) for name in data.vibes]
 
@@ -53,7 +63,7 @@ class AlbumService:
                     album_id=album.id,
                     title=t.title,
                     length_seconds=t.length_seconds,
-                    track_number=t.track_number,
+                    track_order=t.track_order,
                     vibes=[self._get_or_create_named(Vibe, name) for name in t.vibes],
                 )
             )
@@ -126,7 +136,7 @@ class AlbumService:
                         album_id=album.id,
                         title=t["title"],
                         length_seconds=t.get("length_seconds"),
-                        track_number=t["track_number"],
+                        track_order=t["track_order"],
                         vibes=[
                             self._get_or_create_named(Vibe, name)
                             for name in t.get("vibes", [])
