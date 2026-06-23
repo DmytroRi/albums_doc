@@ -52,7 +52,7 @@ class AlbumCreate(AlbumBase):
 class AlbumUpdate(SQLModel):
     """Payload for PATCH /albums/{id}."""
 
-    title: str
+    title: Optional[str] = None
     release_date: Optional[date] = None
     grade: Optional[float] = Field(default=None, ge=0.0, le=5.0)
 
