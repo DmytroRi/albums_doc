@@ -16,9 +16,9 @@ class VibeBase(SQLModel):
 
 
 class Vibe(VibeBase, table=True):
-    """The db table 'vibe'."""
+    """The db table 'vibes'."""
 
-    __tablename__ = "vibe"
+    __tablename__ = "vibes"
 
     id: Optional[int] = Field(default=None, primary_key=True)
 

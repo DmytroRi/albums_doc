@@ -29,7 +29,7 @@ class Genre(GenreBase, table=True):
     )
 
     tracks: list["Track"] = Relationship(
-        back_populates="vibes",
+        back_populates="genres",
         link_model=TrackGenreLink,
     )
 

@@ -1,8 +1,7 @@
 from typing import TYPE_CHECKING, Optional
 
-from sqlmodel import Field, Relationship, SQLModel
-
 from app.models.links import AlbumArtistLink
+from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from app.models.albums import Album
@@ -15,7 +14,7 @@ class ArtistBase(SQLModel):
 
 
 class Artist(ArtistBase, table=True):
-    """The db table 'artist'."""
+    """The db table 'artists'."""
 
     __tablename__ = "artists"
 

@@ -19,12 +19,12 @@ class TrackBase(SQLModel):
 
 
 class Track(TrackBase, table=True):
-    """The db table 'track'."""
+    """The db table 'tracks'."""
 
     __tablename__ = "tracks"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    album_id: int = Field(foreign_key="album.id")
+    album_id: int = Field(foreign_key="albums.id")
 
     album: "Album" = Relationship(back_populates="tracks")
     vibes: list["Vibe"] = Relationship(

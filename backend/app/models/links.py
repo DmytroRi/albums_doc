@@ -6,11 +6,11 @@ class AlbumArtistLink(SQLModel, table=True):
 
     album_id: int | None = Field(
         default=None,
-        foreign_key="album.id",
+        foreign_key="albums.id",
         primary_key=True,
     )
     artist_id: int | None = Field(
-        default=None, foreign_key="artist.id", primary_key=True
+        default=None, foreign_key="artists.id", primary_key=True
     )
 
 
@@ -19,12 +19,12 @@ class AlbumGenreLink(SQLModel, table=True):
 
     album_id: int | None = Field(
         default=None,
-        foreign_key="album.id",
+        foreign_key="albums.id",
         primary_key=True,
     )
     genre_id: int | None = Field(
         default=None,
-        foreign_key="genre.id",
+        foreign_key="genres.id",
         primary_key=True,
     )
 
@@ -34,12 +34,12 @@ class AlbumVibeLink(SQLModel, table=True):
 
     album_id: int | None = Field(
         default=None,
-        foreign_key="album.id",
+        foreign_key="albums.id",
         primary_key=True,
     )
     vibe_id: int | None = Field(
         default=None,
-        foreign_key="vibe.id",
+        foreign_key="vibes.id",
         primary_key=True,
     )
 
@@ -49,12 +49,12 @@ class TrackVibeLink(SQLModel, table=True):
 
     track_id: int | None = Field(
         default=None,
-        foreign_key="track.id",
+        foreign_key="tracks.id",
         primary_key=True,
     )
     vibe_id: int | None = Field(
         default=None,
-        foreign_key="vibe.id",
+        foreign_key="vibes.id",
         primary_key=True,
     )
 
@@ -64,11 +64,11 @@ class TrackGenreLink(SQLModel, table=True):
 
     track_id: int | None = Field(
         default=None,
-        foreign_key="track.id",
+        foreign_key="tracks.id",
         primary_key=True,
     )
     genre_id: int | None = Field(
         default=None,
-        foreign_key="genre.id",
+        foreign_key="genres.id",
         primary_key=True,
     )
