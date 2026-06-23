@@ -20,14 +20,21 @@ class TrackGenreLinkUpdate(SQLModel):
     genre_id: Optional[int] = None
 
 
-def _rollback_and_raise(session: Session, status_code: int, detail: str) -> None:
+def _rollback_and_raise(
+    session: Session,
+    status_code: int,
+    detail: str,
+) -> None:
     session.rollback()
     raise HTTPException(status_code=status_code, detail=detail)
 
 
 def _get_record(session: Session, track_id: int, genre_id: int):
     return session.exec(
-        select(TrackGenreLink).where(TrackGenreLink.track_id == track_id, TrackGenreLink.genre_id == genre_id)
+        select(TrackGenreLink).where(
+            TrackGenreLink.track_id == track_id,
+            TrackGenreLink.genre_id == genre_id,
+        )
     ).first()
 
 
@@ -48,7 +55,10 @@ def list_track_genre_links(
 
 
 @router.post("", response_model=TrackGenreLink, status_code=201)
-def create_track_genre_link(payload: TrackGenreLinkCreate, session: Session = Depends(get_session)):
+def create_track_genre_link(
+    payload: TrackGenreLinkCreate,
+    session: Session = Depends(get_session),
+):
     try:
         record = TrackGenreLink.model_validate(payload)
         session.add(record)
@@ -64,11 +74,18 @@ def create_track_genre_link(payload: TrackGenreLinkCreate, session: Session = De
 
 
 @router.get("/{track_id}/{genre_id}", response_model=TrackGenreLink)
-def get_track_genre_link(track_id: int, genre_id: int, session: Session = Depends(get_session)):
+def get_track_genre_link(
+    track_id: int,
+    genre_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = _get_record(session, track_id, genre_id)
         if not record:
-            raise HTTPException(status_code=404, detail="TrackGenreLink not found")
+            raise HTTPException(
+                status_code=404,
+                detail="TrackGenreLink not found",
+            )
         return record
     except HTTPException:
         raise
@@ -80,12 +97,18 @@ def get_track_genre_link(track_id: int, genre_id: int, session: Session = Depend
 
 @router.patch("/{track_id}/{genre_id}", response_model=TrackGenreLink)
 def update_track_genre_link(
-    track_id: int, genre_id: int, payload: TrackGenreLinkUpdate, session: Session = Depends(get_session)
+    track_id: int,
+    genre_id: int,
+    payload: TrackGenreLinkUpdate,
+    session: Session = Depends(get_session),
 ):
     try:
         record = _get_record(session, track_id, genre_id)
         if not record:
-            raise HTTPException(status_code=404, detail="TrackGenreLink not found")
+            raise HTTPException(
+                status_code=404,
+                detail="TrackGenreLink not found",
+            )
         for key, value in payload.model_dump(exclude_unset=True).items():
             setattr(record, key, value)
         session.add(record)
@@ -101,11 +124,18 @@ def update_track_genre_link(
 
 
 @router.delete("/{track_id}/{genre_id}", status_code=204)
-def delete_track_genre_link(track_id: int, genre_id: int, session: Session = Depends(get_session)):
+def delete_track_genre_link(
+    track_id: int,
+    genre_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = _get_record(session, track_id, genre_id)
         if not record:
-            raise HTTPException(status_code=404, detail="TrackGenreLink not found")
+            raise HTTPException(
+                status_code=404,
+                detail="TrackGenreLink not found",
+            )
         session.delete(record)
         session.commit()
         return None

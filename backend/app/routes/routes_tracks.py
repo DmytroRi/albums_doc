@@ -25,7 +25,11 @@ class TrackReadWithAlbum(TrackRead):
     album_id: int
 
 
-def _rollback_and_raise(session: Session, status_code: int, detail: str) -> None:
+def _rollback_and_raise(
+    session: Session,
+    status_code: int,
+    detail: str,
+) -> None:
     session.rollback()
     raise HTTPException(status_code=status_code, detail=detail)
 
@@ -47,7 +51,10 @@ def list_tracks(
 
 
 @router.post("", response_model=TrackReadWithAlbum, status_code=201)
-def create_track(payload: TrackCreate, session: Session = Depends(get_session)):
+def create_track(
+    payload: TrackCreate,
+    session: Session = Depends(get_session),
+):
     try:
         record = Track.model_validate(payload)
         session.add(record)
@@ -63,11 +70,17 @@ def create_track(payload: TrackCreate, session: Session = Depends(get_session)):
 
 
 @router.get("/{record_id}", response_model=TrackReadWithAlbum)
-def get_track(record_id: int, session: Session = Depends(get_session)):
+def get_track(
+    record_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = session.get(Track, record_id)
         if not record:
-            raise HTTPException(status_code=404, detail="Track not found")
+            raise HTTPException(
+                status_code=404,
+                detail="Track not found",
+            )
         return record
     except HTTPException:
         raise
@@ -78,11 +91,18 @@ def get_track(record_id: int, session: Session = Depends(get_session)):
 
 
 @router.patch("/{record_id}", response_model=TrackReadWithAlbum)
-def update_track(record_id: int, payload: TrackPatch, session: Session = Depends(get_session)):
+def update_track(
+    record_id: int,
+    payload: TrackPatch,
+    session: Session = Depends(get_session),
+):
     try:
         record = session.get(Track, record_id)
         if not record:
-            raise HTTPException(status_code=404, detail="Track not found")
+            raise HTTPException(
+                status_code=404,
+                detail="Track not found",
+            )
         for key, value in payload.model_dump(exclude_unset=True).items():
             setattr(record, key, value)
         session.add(record)
@@ -98,11 +118,17 @@ def update_track(record_id: int, payload: TrackPatch, session: Session = Depends
 
 
 @router.delete("/{record_id}", status_code=204)
-def delete_track(record_id: int, session: Session = Depends(get_session)):
+def delete_track(
+    record_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = session.get(Track, record_id)
         if not record:
-            raise HTTPException(status_code=404, detail="Track not found")
+            raise HTTPException(
+                status_code=404,
+                detail="Track not found",
+            )
         session.delete(record)
         session.commit()
         return None

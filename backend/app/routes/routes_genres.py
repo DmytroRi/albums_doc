@@ -8,7 +8,11 @@ from app.models.genres import Genre, GenreCreate, GenreRead, GenreUpdate
 router = APIRouter(prefix="/genres", tags=["genres"])
 
 
-def _rollback_and_raise(session: Session, status_code: int, detail: str) -> None:
+def _rollback_and_raise(
+    session: Session,
+    status_code: int,
+    detail: str,
+) -> None:
     session.rollback()
     raise HTTPException(status_code=status_code, detail=detail)
 
@@ -30,7 +34,10 @@ def list_genres(
 
 
 @router.post("", response_model=GenreRead, status_code=201)
-def create_genre(payload: GenreCreate, session: Session = Depends(get_session)):
+def create_genre(
+    payload: GenreCreate,
+    session: Session = Depends(get_session),
+):
     try:
         record = Genre.model_validate(payload)
         session.add(record)
@@ -46,7 +53,10 @@ def create_genre(payload: GenreCreate, session: Session = Depends(get_session)):
 
 
 @router.get("/{record_id}", response_model=GenreRead)
-def get_genre(record_id: int, session: Session = Depends(get_session)):
+def get_genre(
+    record_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = session.get(Genre, record_id)
         if not record:
@@ -62,7 +72,9 @@ def get_genre(record_id: int, session: Session = Depends(get_session)):
 
 @router.patch("/{record_id}", response_model=GenreRead)
 def update_genre(
-    record_id: int, payload: GenreUpdate, session: Session = Depends(get_session)
+    record_id: int,
+    payload: GenreUpdate,
+    session: Session = Depends(get_session),
 ):
     try:
         record = session.get(Genre, record_id)
@@ -83,7 +95,10 @@ def update_genre(
 
 
 @router.delete("/{record_id}", status_code=204)
-def delete_genre(record_id: int, session: Session = Depends(get_session)):
+def delete_genre(
+    record_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = session.get(Genre, record_id)
         if not record:

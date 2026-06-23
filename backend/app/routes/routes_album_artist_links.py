@@ -20,14 +20,21 @@ class AlbumArtistLinkUpdate(SQLModel):
     artist_id: Optional[int] = None
 
 
-def _rollback_and_raise(session: Session, status_code: int, detail: str) -> None:
+def _rollback_and_raise(
+    session: Session,
+    status_code: int,
+    detail: str,
+) -> None:
     session.rollback()
     raise HTTPException(status_code=status_code, detail=detail)
 
 
 def _get_record(session: Session, album_id: int, artist_id: int):
     return session.exec(
-        select(AlbumArtistLink).where(AlbumArtistLink.album_id == album_id, AlbumArtistLink.artist_id == artist_id)
+        select(AlbumArtistLink).where(
+            AlbumArtistLink.album_id == album_id,
+            AlbumArtistLink.artist_id == artist_id,
+        )
     ).first()
 
 
@@ -48,7 +55,10 @@ def list_album_artist_links(
 
 
 @router.post("", response_model=AlbumArtistLink, status_code=201)
-def create_album_artist_link(payload: AlbumArtistLinkCreate, session: Session = Depends(get_session)):
+def create_album_artist_link(
+    payload: AlbumArtistLinkCreate,
+    session: Session = Depends(get_session),
+):
     try:
         record = AlbumArtistLink.model_validate(payload)
         session.add(record)
@@ -64,11 +74,18 @@ def create_album_artist_link(payload: AlbumArtistLinkCreate, session: Session = 
 
 
 @router.get("/{album_id}/{artist_id}", response_model=AlbumArtistLink)
-def get_album_artist_link(album_id: int, artist_id: int, session: Session = Depends(get_session)):
+def get_album_artist_link(
+    album_id: int,
+    artist_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = _get_record(session, album_id, artist_id)
         if not record:
-            raise HTTPException(status_code=404, detail="AlbumArtistLink not found")
+            raise HTTPException(
+                status_code=404,
+                detail="AlbumArtistLink not found",
+            )
         return record
     except HTTPException:
         raise
@@ -80,12 +97,18 @@ def get_album_artist_link(album_id: int, artist_id: int, session: Session = Depe
 
 @router.patch("/{album_id}/{artist_id}", response_model=AlbumArtistLink)
 def update_album_artist_link(
-    album_id: int, artist_id: int, payload: AlbumArtistLinkUpdate, session: Session = Depends(get_session)
+    album_id: int,
+    artist_id: int,
+    payload: AlbumArtistLinkUpdate,
+    session: Session = Depends(get_session),
 ):
     try:
         record = _get_record(session, album_id, artist_id)
         if not record:
-            raise HTTPException(status_code=404, detail="AlbumArtistLink not found")
+            raise HTTPException(
+                status_code=404,
+                detail="AlbumArtistLink not found",
+            )
         for key, value in payload.model_dump(exclude_unset=True).items():
             setattr(record, key, value)
         session.add(record)
@@ -101,11 +124,18 @@ def update_album_artist_link(
 
 
 @router.delete("/{album_id}/{artist_id}", status_code=204)
-def delete_album_artist_link(album_id: int, artist_id: int, session: Session = Depends(get_session)):
+def delete_album_artist_link(
+    album_id: int,
+    artist_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = _get_record(session, album_id, artist_id)
         if not record:
-            raise HTTPException(status_code=404, detail="AlbumArtistLink not found")
+            raise HTTPException(
+                status_code=404,
+                detail="AlbumArtistLink not found",
+            )
         session.delete(record)
         session.commit()
         return None

@@ -8,7 +8,11 @@ from app.models.artists import Artist, ArtistCreate, ArtistRead, ArtistUpdate
 router = APIRouter(prefix="/artists", tags=["artists"])
 
 
-def _rollback_and_raise(session: Session, status_code: int, detail: str) -> None:
+def _rollback_and_raise(
+    session: Session,
+    status_code: int,
+    detail: str,
+) -> None:
     session.rollback()
     raise HTTPException(status_code=status_code, detail=detail)
 
@@ -30,7 +34,10 @@ def list_artists(
 
 
 @router.post("", response_model=ArtistRead, status_code=201)
-def create_artist(payload: ArtistCreate, session: Session = Depends(get_session)):
+def create_artist(
+    payload: ArtistCreate,
+    session: Session = Depends(get_session),
+):
     try:
         record = Artist.model_validate(payload)
         session.add(record)
@@ -46,11 +53,17 @@ def create_artist(payload: ArtistCreate, session: Session = Depends(get_session)
 
 
 @router.get("/{record_id}", response_model=ArtistRead)
-def get_artist(record_id: int, session: Session = Depends(get_session)):
+def get_artist(
+    record_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = session.get(Artist, record_id)
         if not record:
-            raise HTTPException(status_code=404, detail="Artist not found")
+            raise HTTPException(
+                status_code=404,
+                detail="Artist not found",
+            )
         return record
     except HTTPException:
         raise
@@ -62,12 +75,17 @@ def get_artist(record_id: int, session: Session = Depends(get_session)):
 
 @router.patch("/{record_id}", response_model=ArtistRead)
 def update_artist(
-    record_id: int, payload: ArtistUpdate, session: Session = Depends(get_session)
+    record_id: int,
+    payload: ArtistUpdate,
+    session: Session = Depends(get_session),
 ):
     try:
         record = session.get(Artist, record_id)
         if not record:
-            raise HTTPException(status_code=404, detail="Artist not found")
+            raise HTTPException(
+                status_code=404,
+                detail="Artist not found",
+            )
         for key, value in payload.model_dump(exclude_unset=True).items():
             setattr(record, key, value)
         session.add(record)
@@ -83,7 +101,10 @@ def update_artist(
 
 
 @router.delete("/{record_id}", status_code=204)
-def delete_artist(record_id: int, session: Session = Depends(get_session)):
+def delete_artist(
+    record_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = session.get(Artist, record_id)
         if not record:

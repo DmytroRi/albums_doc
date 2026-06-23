@@ -8,7 +8,11 @@ from app.models.vibes import Vibe, VibeCreate, VibeRead, VibeUpdate
 router = APIRouter(prefix="/vibes", tags=["vibes"])
 
 
-def _rollback_and_raise(session: Session, status_code: int, detail: str) -> None:
+def _rollback_and_raise(
+    session: Session,
+    status_code: int,
+    detail: str,
+) -> None:
     session.rollback()
     raise HTTPException(status_code=status_code, detail=detail)
 
@@ -30,7 +34,10 @@ def list_vibes(
 
 
 @router.post("", response_model=VibeRead, status_code=201)
-def create_vibe(payload: VibeCreate, session: Session = Depends(get_session)):
+def create_vibe(
+    payload: VibeCreate,
+    session: Session = Depends(get_session),
+):
     try:
         record = Vibe.model_validate(payload)
         session.add(record)
@@ -46,11 +53,17 @@ def create_vibe(payload: VibeCreate, session: Session = Depends(get_session)):
 
 
 @router.get("/{record_id}", response_model=VibeRead)
-def get_vibe(record_id: int, session: Session = Depends(get_session)):
+def get_vibe(
+    record_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = session.get(Vibe, record_id)
         if not record:
-            raise HTTPException(status_code=404, detail="Vibe not found")
+            raise HTTPException(
+                status_code=404,
+                detail="Vibe not found",
+            )
         return record
     except HTTPException:
         raise
@@ -62,12 +75,17 @@ def get_vibe(record_id: int, session: Session = Depends(get_session)):
 
 @router.patch("/{record_id}", response_model=VibeRead)
 def update_vibe(
-    record_id: int, payload: VibeUpdate, session: Session = Depends(get_session)
+    record_id: int,
+    payload: VibeUpdate,
+    session: Session = Depends(get_session),
 ):
     try:
         record = session.get(Vibe, record_id)
         if not record:
-            raise HTTPException(status_code=404, detail="Vibe not found")
+            raise HTTPException(
+                status_code=404,
+                detail="Vibe not found",
+            )
         for key, value in payload.model_dump(exclude_unset=True).items():
             setattr(record, key, value)
         session.add(record)
@@ -83,11 +101,17 @@ def update_vibe(
 
 
 @router.delete("/{record_id}", status_code=204)
-def delete_vibe(record_id: int, session: Session = Depends(get_session)):
+def delete_vibe(
+    record_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = session.get(Vibe, record_id)
         if not record:
-            raise HTTPException(status_code=404, detail="Vibe not found")
+            raise HTTPException(
+                status_code=404,
+                detail="Vibe not found",
+            )
         session.delete(record)
         session.commit()
         return None

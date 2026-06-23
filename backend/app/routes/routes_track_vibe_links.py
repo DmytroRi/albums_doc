@@ -20,14 +20,21 @@ class TrackVibeLinkUpdate(SQLModel):
     vibe_id: Optional[int] = None
 
 
-def _rollback_and_raise(session: Session, status_code: int, detail: str) -> None:
+def _rollback_and_raise(
+    session: Session,
+    status_code: int,
+    detail: str,
+) -> None:
     session.rollback()
     raise HTTPException(status_code=status_code, detail=detail)
 
 
 def _get_record(session: Session, track_id: int, vibe_id: int):
     return session.exec(
-        select(TrackVibeLink).where(TrackVibeLink.track_id == track_id, TrackVibeLink.vibe_id == vibe_id)
+        select(TrackVibeLink).where(
+            TrackVibeLink.track_id == track_id,
+            TrackVibeLink.vibe_id == vibe_id,
+        )
     ).first()
 
 
@@ -48,7 +55,10 @@ def list_track_vibe_links(
 
 
 @router.post("", response_model=TrackVibeLink, status_code=201)
-def create_track_vibe_link(payload: TrackVibeLinkCreate, session: Session = Depends(get_session)):
+def create_track_vibe_link(
+    payload: TrackVibeLinkCreate,
+    session: Session = Depends(get_session),
+):
     try:
         record = TrackVibeLink.model_validate(payload)
         session.add(record)
@@ -64,11 +74,18 @@ def create_track_vibe_link(payload: TrackVibeLinkCreate, session: Session = Depe
 
 
 @router.get("/{track_id}/{vibe_id}", response_model=TrackVibeLink)
-def get_track_vibe_link(track_id: int, vibe_id: int, session: Session = Depends(get_session)):
+def get_track_vibe_link(
+    track_id: int,
+    vibe_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = _get_record(session, track_id, vibe_id)
         if not record:
-            raise HTTPException(status_code=404, detail="TrackVibeLink not found")
+            raise HTTPException(
+                status_code=404,
+                detail="TrackVibeLink not found",
+            )
         return record
     except HTTPException:
         raise
@@ -80,12 +97,18 @@ def get_track_vibe_link(track_id: int, vibe_id: int, session: Session = Depends(
 
 @router.patch("/{track_id}/{vibe_id}", response_model=TrackVibeLink)
 def update_track_vibe_link(
-    track_id: int, vibe_id: int, payload: TrackVibeLinkUpdate, session: Session = Depends(get_session)
+    track_id: int,
+    vibe_id: int,
+    payload: TrackVibeLinkUpdate,
+    session: Session = Depends(get_session),
 ):
     try:
         record = _get_record(session, track_id, vibe_id)
         if not record:
-            raise HTTPException(status_code=404, detail="TrackVibeLink not found")
+            raise HTTPException(
+                status_code=404,
+                detail="TrackVibeLink not found",
+            )
         for key, value in payload.model_dump(exclude_unset=True).items():
             setattr(record, key, value)
         session.add(record)
@@ -101,11 +124,18 @@ def update_track_vibe_link(
 
 
 @router.delete("/{track_id}/{vibe_id}", status_code=204)
-def delete_track_vibe_link(track_id: int, vibe_id: int, session: Session = Depends(get_session)):
+def delete_track_vibe_link(
+    track_id: int,
+    vibe_id: int,
+    session: Session = Depends(get_session),
+):
     try:
         record = _get_record(session, track_id, vibe_id)
         if not record:
-            raise HTTPException(status_code=404, detail="TrackVibeLink not found")
+            raise HTTPException(
+                status_code=404,
+                detail="TrackVibeLink not found",
+            )
         session.delete(record)
         session.commit()
         return None
