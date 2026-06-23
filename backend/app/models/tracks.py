@@ -15,7 +15,7 @@ class TrackBase(SQLModel):
 
     title: str
     length_seconds: Optional[int] = None
-    track_number: int
+    track_order: int
 
 
 class Track(TrackBase, table=True):
@@ -48,7 +48,7 @@ class TrackUpdate(SQLModel):
 
     title: Optional[str] = None
     length_seconds: Optional[int] = None
-    track_number: Optional[int] = None
+    track_order: Optional[int] = None
 
 
 class TrackRead(TrackBase):

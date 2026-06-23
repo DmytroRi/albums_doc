@@ -6,6 +6,7 @@ Create Date: 2026-05-10
 """
 
 import sqlalchemy as sa
+
 from alembic import op
 
 revision = "0001_init_schema"
@@ -40,7 +41,7 @@ def upgrade() -> None:
             sa.ForeignKey("albums.id", ondelete="CASCADE"),
             nullable=False,
         ),
-        sa.Column("track_number", sa.Integer(), nullable=False),
+        sa.Column("track_order", sa.Integer(), nullable=False),
         sa.Column("title", sa.String(), nullable=False),
         sa.Column("length_seconds", sa.Integer(), nullable=True),
     )

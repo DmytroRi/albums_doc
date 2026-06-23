@@ -35,12 +35,12 @@ class AlbumService:
             tracks=[
                 TrackRead(
                     id=t.id,
-                    track_number=t.track_number,
+                    track_order=t.track_order,
                     title=t.title,
                     length_seconds=t.length_seconds,
                     vibes=[v.name for v in t.vibes],
                 )
-                for t in sorted(album.tracks, key=lambda x: x.track_number)
+                for t in sorted(album.tracks, key=lambda x: x.track_order)
             ],
         )
 
@@ -63,7 +63,7 @@ class AlbumService:
                     album_id=album.id,
                     title=t.title,
                     length_seconds=t.length_seconds,
-                    track_number=t.track_number,
+                    track_order=t.track_order,
                     vibes=[self._get_or_create_named(Vibe, name) for name in t.vibes],
                 )
             )
@@ -136,7 +136,7 @@ class AlbumService:
                         album_id=album.id,
                         title=t["title"],
                         length_seconds=t.get("length_seconds"),
-                        track_number=t["track_number"],
+                        track_order=t["track_order"],
                         vibes=[
                             self._get_or_create_named(Vibe, name)
                             for name in t.get("vibes", [])
