@@ -7,10 +7,9 @@ from app.db.session import get_session
 
 router = APIRouter(prefix="/dev", tags=["dev"])
 
+
 @router.get("/tables", include_in_schema=False)
-def get_tables_with_row_counts(
-    session: Session = Depends(get_session)
-) -> dict:
+def get_tables_with_row_counts(session: Session = Depends(get_session)) -> dict:
     """Get all public tables with row counts."""
 
     statement = text("""
@@ -46,11 +45,8 @@ def get_tables_with_row_counts(
         for row in result
     ]
 
-    return {
-        "schema": "public",
-        "tables": tables,
-        "count": len(tables)
-    }
+    return {"schema": "public", "tables": tables, "count": len(tables)}
+
 
 @router.get("/{table_name}", include_in_schema=False)
 def get_table_info(table_name: str, session: Session = Depends(get_session)):
@@ -66,9 +62,7 @@ def get_table_info(table_name: str, session: Session = Depends(get_session)):
         ORDER BY ordinal_position;
     """)
 
-    result = session.exec(
-        statement.params(table_name=table_name)
-    ).all()
+    result = session.exec(statement.params(table_name=table_name)).all()
 
     columns = [
         {
@@ -81,19 +75,15 @@ def get_table_info(table_name: str, session: Session = Depends(get_session)):
     if not columns:
         raise HTTPException(
             status_code=404,
-            detail=f"Table '{table_name}' not found"
+            detail=f"Table '{table_name}' not found",
         )
 
-    return {
-        "table_name": table_name,
-        "columns": columns
-    }
+    return {"table_name": table_name, "columns": columns}
 
 
 @router.get("/{table_name}/all", include_in_schema=False)
 def get_all_table_rows(
-    table_name: str,
-    session: Session = Depends(get_session)
+    table_name: str, session: Session = Depends(get_session)
 ) -> dict:
     """Get all rows from a table."""
 
@@ -101,13 +91,6 @@ def get_all_table_rows(
 
     result = session.exec(statement)
 
-    rows = [
-        dict(row._mapping)
-        for row in result
-    ]
+    rows = [dict(row._mapping) for row in result]
 
-    return {
-        "table_name": table_name,
-        "rows": rows,
-        "count": len(rows)
-    }
+    return {"table_name": table_name, "rows": rows, "count": len(rows)}
