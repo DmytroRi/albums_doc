@@ -1,0 +1,14 @@
+targets:
+  $default:
+    builders:
+      openapi_generator|openapi_generator:
+        enabled: true
+        options:
+          inputSpec: openapi/api.yaml
+          generatorName: dart-dio
+          outputDirectory: lib/src/api
+          additionalProperties:
+            pubName: openapi_generator
+            pubAuthor: art-lib
+            useEnumExtension: true
+            nullableFields: true

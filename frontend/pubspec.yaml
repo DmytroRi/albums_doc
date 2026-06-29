@@ -12,6 +12,8 @@ dependencies:
   flutter_bloc: ^8.1.6
   equatable: ^2.0.5
   dio: ^5.7.0
+  openapi_generator:
+    path: packages/openapi_generator
 
 dev_dependencies:
   flutter_test:
